@@ -1,0 +1,314 @@
+:root {
+  --talk-bg: #0b0d0f;
+  --talk-panel: #181b20;
+  --talk-text: #f4f0e8;
+  --talk-muted: #9ca3ad;
+  --talk-red: #ff5c4d;
+  --talk-green: #a6ff5f;
+  --talk-line: #30353d;
+}
+
+.slidev-layout {
+  background: var(--talk-bg);
+  color: var(--talk-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: 3.25rem 4rem;
+}
+
+.slidev-layout h1,
+.slidev-layout h2,
+.slidev-layout h3 {
+  color: var(--talk-text);
+  font-weight: 760;
+  letter-spacing: -0.045em;
+}
+
+.slidev-layout h1 {
+  font-size: 3.15rem;
+  line-height: 0.98;
+  margin: 0 0 1.5rem;
+  max-width: 930px;
+}
+
+.slidev-layout h2 {
+  color: var(--talk-red);
+  font-size: 1.55rem;
+  margin: 0.65rem 0 0;
+}
+
+.slidev-layout p,
+.slidev-layout li {
+  font-size: 1.1rem;
+  line-height: 1.45;
+}
+
+.slidev-layout code {
+  font-size: 0.85em;
+}
+
+.slidev-layout .slidev-code {
+  border: 1px solid var(--talk-line);
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.eyebrow {
+  color: var(--talk-red);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  margin-bottom: 1.15rem;
+  text-transform: uppercase;
+}
+
+.accent,
+.final-word {
+  color: var(--talk-red);
+}
+
+.muted {
+  color: var(--talk-muted);
+}
+
+.lead {
+  font-size: 1.35rem !important;
+}
+
+.cover-meta {
+  border-top: 1px solid var(--talk-line);
+  bottom: 3rem;
+  display: flex;
+  justify-content: space-between;
+  left: 4rem;
+  padding-top: 0.9rem;
+  position: absolute;
+  right: 4rem;
+}
+
+.big-copy {
+  font-size: 2.25rem;
+  line-height: 1.05;
+  margin-bottom: 1.5rem;
+}
+
+.stack-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.stack-list span {
+  border-bottom: 1px solid var(--talk-line);
+  font-size: 1.35rem;
+  padding: 0.5rem 0;
+}
+
+.statement-slide,
+.metric-slide,
+.final-slide {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.statement-slide h1,
+.final-slide h1 {
+  font-size: 3.55rem;
+  max-width: 1050px;
+}
+
+.aside {
+  border-left: 6px solid var(--talk-green);
+  font-size: 1.55rem;
+  font-weight: 650;
+  line-height: 1.45;
+  padding: 0.25rem 0 0.25rem 1.5rem;
+}
+
+.mega-commit {
+  display: flex;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.45rem;
+  gap: 1.5rem;
+  margin: 1.8rem 0;
+}
+
+.mega-commit .plus {
+  color: var(--talk-green);
+}
+
+.mega-commit .minus {
+  color: var(--talk-red);
+}
+
+.failure-copy {
+  border-left: 6px solid var(--talk-red);
+  font-size: 1.6rem;
+  line-height: 1.2;
+  margin: 0.3rem 0 1.3rem;
+  padding-left: 1.2rem;
+}
+
+.failure-copy strong {
+  color: var(--talk-red);
+  display: block;
+}
+
+.compact {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.compact li {
+  margin-bottom: 0.35rem;
+}
+
+.screenshot-slide {
+  background-position: center center !important;
+  background-size: cover !important;
+  padding: 0;
+}
+
+.screenshot-caption {
+  background: rgba(11, 13, 15, 0.94);
+  border-left: 6px solid var(--talk-red);
+  bottom: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  left: 2.2rem;
+  padding: 1rem 1.35rem;
+  position: absolute;
+}
+
+.screenshot-caption .eyebrow {
+  margin: 0 0 0.25rem;
+}
+
+.screenshot-caption strong {
+  font-size: 1.65rem;
+}
+
+.screenshot-caption small {
+  color: var(--talk-muted);
+}
+
+.truth-box {
+  background: var(--talk-panel);
+  border-top: 6px solid var(--talk-green);
+  min-height: 190px;
+  padding: 1.2rem;
+}
+
+.truth-box.danger {
+  border-top-color: var(--talk-red);
+}
+
+.truth-box span {
+  color: var(--talk-muted);
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  margin-bottom: 1rem;
+}
+
+.truth-box strong {
+  font-size: 1.35rem;
+  line-height: 1.35;
+}
+
+.bottom-line {
+  border-top: 1px solid var(--talk-line);
+  bottom: 2.25rem;
+  font-size: 1.1rem;
+  left: 4rem;
+  padding-top: 0.75rem;
+  position: absolute;
+  right: 4rem;
+}
+
+.code-panel {
+  background: var(--talk-panel);
+  border-top: 6px solid var(--talk-line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 170px;
+  padding: 1.15rem 1.25rem;
+}
+
+.code-panel.danger {
+  border-top-color: var(--talk-red);
+}
+
+.code-panel.success {
+  border-top-color: var(--talk-green);
+}
+
+.code-panel small {
+  color: var(--talk-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.code-panel code,
+.code-panel strong {
+  background: transparent;
+  color: var(--talk-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.code-panel.danger strong:last-child {
+  color: var(--talk-red);
+}
+
+.code-panel.success strong {
+  color: var(--talk-green);
+}
+
+.fix-stream {
+  color: var(--talk-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  margin-top: 1.8rem;
+}
+
+.lessons {
+  display: grid;
+  gap: 0;
+  margin-top: 1rem;
+}
+
+.lessons div {
+  align-items: baseline;
+  border-top: 1px solid var(--talk-line);
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 3rem 1fr;
+  padding: 0.65rem 0;
+}
+
+.lessons span {
+  color: var(--talk-red);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.lessons strong {
+  font-size: 1.25rem;
+}
+
+.final-word {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-top: 2rem;
+}
+
+.two-cols-header {
+  column-gap: 2.5rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+.two-cols-header > h1 {
+  grid-column: 1 / 3;
+}
