@@ -19,7 +19,7 @@ drawings:
 
 <div class="cover-meta">
   <span>Пётр Белобородов</span>
-  <span>networkly.app</span>
+  <img class="cover-networkly-logo" src="/brand/networkly.svg" alt="Нетворкли">
 </div>
 
 <!--
@@ -43,15 +43,45 @@ layout: two-cols-header
   fullstack PHP + JS
 </div>
 
-В соло делаю **networkly.app** — каталог IT-мероприятий.
+<div class="networkly-lockup">
+  <img class="networkly-logo" src="/brand/networkly.svg" alt="Нетворкли">
+  <span>В соло делаю каталог IT-мероприятий.</span>
+</div>
 
 ::right::
 
 <div class="stack-list">
-  <span>PHP / Symfony</span>
-  <span>Vue / Pinia</span>
-  <span>V8 внутри PHP</span>
-  <span class="accent">теперь ещё Nuxt</span>
+  <div class="stack-row">
+    <span class="tech-label">
+      <img class="tech-icon" src="/tech/php.svg" alt="PHP">
+      <span>PHP</span>
+    </span>
+    <span class="tech-slash">/</span>
+    <span class="tech-label">
+      <img class="tech-icon tech-icon-light" src="/tech/symfony.svg" alt="Symfony">
+      <span>Symfony</span>
+    </span>
+  </div>
+  <div class="stack-row">
+    <span class="tech-label">
+      <img class="tech-icon" src="/tech/vuedotjs.svg" alt="Vue.js">
+      <span>Vue</span>
+    </span>
+    <span class="tech-slash">/</span>
+    <span class="tech-label">
+      <img class="tech-icon" src="/tech/pinia.svg" alt="Pinia">
+      <span>Pinia</span>
+    </span>
+  </div>
+  <div class="stack-row stack-row-text">
+    <span>V8 внутри PHP</span>
+  </div>
+  <div class="stack-row accent">
+    <span class="tech-label">
+      <img class="tech-icon" src="/tech/nuxt.svg" alt="Nuxt">
+      <span>теперь ещё Nuxt</span>
+    </span>
+  </div>
 </div>
 
 <!--
@@ -192,9 +222,16 @@ flowchart TD
 ::right::
 
 <div class="aside">
-  PHP не умирал.<br>
-  V8 жил внутри него.<br>
-  Специальные версии компонентов рендерились на сервере.
+  <strong>Да, это работало.</strong><br>
+  PHP не умирал, V8 жил внутри него.<br>
+  Компоненты рендерились на сервере.
+</div>
+
+<div class="failure-copy server-flaw">
+  <strong>Но правила URL жили дважды</strong>
+  <code>/event?event_filter[city_id][]=524901</code>
+  <span>→ 301 /event/moscow</span>
+  PHP и JS независимо разбирали один фильтр.
 </div>
 
 <!--
@@ -205,6 +242,10 @@ V8 подгружался как so-библиотека, а в SSR прокид
 подготовленные данные для Pinia.
 
 Да, звучит дико. Но оно работало.
+
+Концептуальная цена — дублирование логики. И PHP, и JavaScript должны были
+разобрать event_filter, понять, что 524901 — Москва, и знать канонический
+адрес /event/moscow. Эти правила могли разъехаться.
 -->
 
 ---
@@ -265,20 +306,30 @@ return renderToString(app)
 
 ---
 layout: center
-class: metric-slide
+class: metric-slide lebowski-slide
 ---
 
 <div class="eyebrow">План был простой</div>
 
 # Отдать страницу агенту → получить Nuxt → переключить маршрут
 
-<div class="mega-commit">
-  <span>303 файла</span>
-  <span class="plus">+34 969</span>
-  <span class="minus">−11 369</span>
+<div v-click="1" class="lebowski-reaction">
+  <blockquote class="lebowski-quote">
+    Хороший план.<br>
+    <strong>Надёжный, как швейцарские часы.</strong>
+  </blockquote>
+  <img class="lebowski-cutout" src="/lebowski-cutout.png" alt="Дюдя из фильма «Большой Лебовски»">
 </div>
 
-<p class="muted">Один исходный коммит. Что-то современное явно произошло.</p>
+<div v-click="2" class="commit-reveal">
+  <div class="mega-commit">
+    <span>303 файла</span>
+    <span class="plus">+34 969</span>
+    <span class="minus">−11 369</span>
+  </div>
+
+  <p class="muted">Один исходный коммит. Что-то современное явно произошло.</p>
+</div>
 
 <!--
 4:50–5:40
@@ -286,6 +337,10 @@ class: metric-slide
 Исходный Nuxt-коммит c446191c затронул 303 файла.
 Это не обязательно плохо само по себе, но отлично показывает разницу
 между ожидаемым переносом страницы и фактическим созданием второго приложения.
+
+[click] Хороший план. Надёжный, как швейцарские часы.
+
+[click] И только потом — масштаб исходного коммита: 303 файла.
 -->
 
 ---
@@ -321,7 +376,7 @@ const related = await Promise.allSettled([
 <ul class="compact">
   <li>медленный первый ответ</li>
   <li>раздутый composable</li>
-  <li>страница знает обо всех детях</li>
+  <li>секции нельзя загружать независимо</li>
   <li>ручная раскладка по четырём store</li>
 </ul>
 
@@ -396,54 +451,67 @@ layout: two-cols-header
 layout: two-cols-header
 ---
 
-# Минус №3. Nuxt поехал — legacy сломался
+# Минус №3. Агент строил новый проект.<br>Я мигрировал старый
 
 ::left::
 
-<div class="code-panel danger">
-  <small>Было</small>
-  <code>loadOnFilterChange?: boolean</code>
-  <strong>Nuxt → false</strong>
-  <strong>Legacy → undefined → false</strong>
+<div class="migration-side migration-expectation">
+  <small>Агент видел</small>
+  <div class="nuxt-only">
+    <img src="/tech/nuxt.svg" alt="Nuxt">
+    <strong>Nuxt</strong>
+  </div>
+  <span>новый хозяин компонента</span>
 </div>
 
 ::right::
 
-<div class="code-panel success">
-  <small>Стало</small>
-  <code>withDefaults(defineProps(), {</code>
-  <strong>loadOnFilterChange: true</strong>
-  <code>})</code>
+<div class="migration-side migration-reality">
+  <small>В реальности</small>
+  <div class="shared-component">общий Vue-компонент</div>
+  <div class="shared-arrow">↓ используют</div>
+  <div class="shared-consumers">
+    <span>Legacy / Twig</span>
+    <span>Web Components</span>
+    <span>Nuxt</span>
+  </div>
 </div>
 
 <div class="bottom-line">
-  Общий компонент адаптировали под Nuxt —<br>
-  старый каталог перестал загружать данные при смене фильтра.
+  Общий компонент адаптировали под Nuxt — и забыли проверить старых потребителей.
 </div>
 
 <!--
 9:50–11:10
 
-Кандидат на третий факап из реального исправления 4173a3ec.
+Это не рассказ про один неудачный boolean. Агент смотрел на Nuxt как на новый
+проект и нового владельца компонентов. Но это была миграция живой системы:
+те же Vue-компоненты продолжали использовать Legacy / Twig и Web Components.
 
-В общий EventsListForMainSite добавили необязательный prop. Для Nuxt явно
-передавали false, а старые потребители не передавали ничего и тоже получили
-falsy. Исправление — legacy-compatible default true.
-
-Если этот эпизод не подходит по ощущениям, заменить слайд, не меняя структуру.
+Реальный пример из исправления 4173a3ec — необязательный loadOnFilterChange.
+Nuxt явно передавал false, старые потребители не передавали ничего и тоже
+получили falsy. Конкретный баг — доказательство, а не главный тезис.
 -->
 
 ---
 layout: center
-class: statement-slide
+class: statement-slide result-slide
 ---
 
+<div class="result-layout">
+<div class="result-copy">
 <div class="eyebrow">Что получилось</div>
 
-# Код появился быстрее,<br>чем я научился его <span class="accent">валидировать</span>
+<h1>Код появился быстрее,<br>чем я научился его <span class="accent">валидировать</span></h1>
 
 <div class="fix-stream">
-  composable → SEO → routing → legacy → assets → analytics → tests
+composable → SEO → routing → legacy → assets → analytics → tests
+</div>
+</div>
+
+<figure v-click class="result-meme">
+<img src="/cuckcoding.png" alt="Cuckcoding: Claude Code, проект и разработчик">
+</figure>
 </div>
 
 <!--
@@ -453,6 +521,8 @@ class: statement-slide
 код генерируется мгновенно, а понимание нового фреймворка — нет.
 
 Уверенный рабочий код ещё надо уметь отличить от уверенно выглядящего.
+
+[click] И вот это довольно точно описывает, как ощущался результат.
 -->
 
 ---
@@ -462,20 +532,56 @@ layout: default
 # Что я из этого вынес
 
 <div class="lessons">
-  <div><span>01</span><strong>Новый фреймворк всё равно придётся изучить.</strong></div>
-  <div><span>02</span><strong>Нельзя делегировать ещё не приобретённый навык.</strong></div>
-  <div><span>03</span><strong>Тесты сделали этот эксперимент вообще возможным.</strong></div>
-  <div><span>04</span><strong>Я всё ещё не решил: продолжать кактус или откатить.</strong></div>
+  <div v-click class="lesson">
+    <span class="lesson-number">01</span>
+    <div class="lesson-copy">
+      <strong>Новый фреймворк всё равно придётся изучить.</strong>
+      <p>Агент ускоряет написание кода, но не заменяет понимание.</p>
+    </div>
+  </div>
+  <div v-click class="lesson">
+    <span class="lesson-number">02</span>
+    <div class="lesson-copy">
+      <strong>Нельзя делегировать ещё не приобретённый навык.</strong>
+      <p>Если я не знаю, как правильно, то не отличу решение от правдоподобной имитации.</p>
+    </div>
+  </div>
+  <div v-click class="lesson">
+    <span class="lesson-number">03</span>
+    <div class="lesson-copy">
+      <strong>Тесты сделали этот эксперимент вообще возможным.</strong>
+      <p>Без регрессионных тестов я бы не рискнул менять живую систему.</p>
+    </div>
+  </div>
+  <div v-click class="lesson">
+    <span class="lesson-number">04</span>
+    <div class="lesson-copy">
+      <strong>Я всё ещё не решил: продолжать кактус или откатить.</strong>
+      <p>Эксперимент дал знания, но ещё не доказал, что миграцию стоит продолжать.</p>
+    </div>
+  </div>
+  <div v-click class="lesson">
+    <span class="lesson-number">05</span>
+    <div class="lesson-copy">
+      <strong>Нужен был отдельный контур контроля качества.</strong>
+      <p>Функциональные тесты не ловили рост связности, сложности и времени ответа.</p>
+    </div>
+  </div>
 </div>
 
 <!--
 12:15–13:45
 
-Главная идея из заметки: нельзя просто взять фреймворк и перенести на него всё.
-Его надо изучить, а это время.
+[click] Агент ускоряет написание кода, но не заменяет понимание.
 
-Без тестов я бы не стал даже пробовать. И честный текущий результат:
-я пока не уверен, стоит ли продолжать миграцию.
+[click] Если я сам не приобрёл навык, я не смогу нормально проверить результат агента.
+
+[click] Без регрессионных тестов я бы не стал даже пробовать.
+
+[click] И честный текущий результат: я пока не уверен, стоит ли продолжать миграцию.
+
+[click] Но функционального harness оказалось мало. Нужны были ограничения
+на связность и сложность плюс хотя бы базовые замеры производительности.
 -->
 
 ---
