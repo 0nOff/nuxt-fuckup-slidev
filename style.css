@@ -101,6 +101,31 @@
   margin-bottom: 1.5rem;
 }
 
+.speaker-content {
+  align-items: center;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+}
+
+.speaker-portrait {
+  align-self: end;
+  margin: 0;
+}
+
+.speaker-photo {
+  display: block;
+  height: 21rem;
+  object-fit: contain;
+  object-position: center bottom;
+  width: 100%;
+}
+
+.speaker-role {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
 .networkly-lockup {
   border-top: 1px solid var(--talk-line);
   display: grid;
@@ -472,7 +497,7 @@
   display: grid;
   gap: 1rem;
   grid-template-columns: 2.5rem 1fr;
-  padding: 0.48rem 0;
+  padding: 1rem 0;
 }
 
 .lesson-number {
@@ -482,15 +507,15 @@
 
 .lesson-copy strong {
   display: block;
-  font-size: 1.02rem;
+  font-size: 1.35rem;
   line-height: 1.2;
 }
 
 .lesson-copy p {
   color: var(--talk-muted);
-  font-size: 0.72rem;
+  font-size: 1rem;
   line-height: 1.25;
-  margin: 0.16rem 0 0;
+  margin: 0.35rem 0 0;
 }
 
 .final-word {

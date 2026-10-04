@@ -31,17 +31,48 @@ drawings:
 -->
 
 ---
+layout: default
+class: speaker-slide
+---
+
+# Кто я
+
+<div class="speaker-content">
+<figure class="speaker-portrait">
+<img class="speaker-photo" src="/petr-cutout.png" alt="Пётр Белобородов">
+</figure>
+
+<div class="speaker-bio">
+
+<div class="big-copy">
+  <strong>Пётр Белобородов</strong><br>
+  <span class="speaker-role">fullstack PHP + JS</span>
+</div>
+
+<ul>
+  <li>13 лет в индустрии за деньги</li>
+  <li>Продуктовый разработчик</li>
+  <li>В основном работаю в небольших компаниях</li>
+</ul>
+
+</div>
+</div>
+
+<!--
+0:40–1:00
+
+Пётр Белобородов, fullstack PHP + JS. В индустрии за деньги уже 13 лет.
+Позиционирую себя как продуктового разработчика, работаю в основном
+в небольших компаниях.
+-->
+
+---
 layout: two-cols-header
 ---
 
-# Кто я и что я делаю
+# Что я делаю
 
 ::left::
-
-<div class="big-copy">
-  <strong>Пётр</strong><br>
-  fullstack PHP + JS
-</div>
 
 <div class="networkly-lockup">
   <img class="networkly-logo" src="/brand/networkly.svg" alt="Нетворкли">
@@ -84,32 +115,80 @@ layout: two-cols-header
   </div>
 </div>
 
-<!--
-0:40–1:25
+<SlidevVideo v-click autoplay autoreset="slide" controls muted playsinline class="absolute inset-0 w-full h-full object-contain bg-[#0b0d0f]" aria-label="Демонстрация интерфейса Networkly">
+  <source src="/networkly-demo.mp4" type="video/mp4" />
+</SlidevVideo>
 
-Коротко представиться. Не объяснять продукт подробно: достаточно сказать,
-что это живой сервис, который я разрабатываю один, поэтому весь технический
-долг — персональный и очень близкий.
+<!--
+Около минуты вместе с роликом.
+
+Networkly — живой сервис, который я разрабатываю один, поэтому весь
+технический долг — персональный и очень близкий. Коротко показать стек.
+
+[click] Ролик на 42 секунды: показать интерфейс и рассказать,
+что он позволяет делать и зачем я развиваю этот проект.
 -->
 
 ---
-layout: center
-class: statement-slide
+layout: default
+---
+
+# Зачем я делаю Networkly
+
+<figure class="m-0">
+<img src="/networkly-mission-2019.png" alt="Идея Networkly в 2019 году: развитие IT-специалистов через сообщества и обмен знаниями" class="w-full h-[350px] object-cover">
+<figcaption class="mt-2 text-sm muted">Идея проекта, 2019</figcaption>
+</figure>
+
+<!--
+20–30 секунд.
+
+Это моя попытка сформулировать ценность проекта в 2019 году:
+помочь IT-специалистам развиваться через сообщества и обмен знаниями.
+
+Сейчас направление немного меняется, но я по-прежнему считаю,
+что сообщества и конференции важны. В 2026 году быть в комьюнити
+для меня стало ещё важнее. Поэтому я продолжаю делать Networkly.
+-->
+
+---
+layout: default
 ---
 
 <div class="eyebrow">Завязка</div>
 
-# Мне захотелось<br><span class="accent">нормальный современный фронтенд</span>
+# Почему я решил переехать
 
-<p class="muted lead">Nuxt уже существует. Агент уже существует.<br>Что может пойти не так?</p>
+<div v-click class="mb-6">
+<h3>Просто захотелось</h3>
+<p>Могу себе позволить эксперимент. Академический интерес.</p>
+</div>
+
+<div v-click class="mb-6">
+<h3>Самодельный SSR сложно поддерживать</h3>
+<p>Каталог мероприятий должен хорошо индексироваться.<br>SSR для проекта очень важен.</p>
+</div>
+
+<div v-click>
+<h3>Мини-аппам нужна более удобная основа</h3>
+<p>Сейчас они просто на Vue-компоненте — и это не очень удобно.</p>
+</div>
 
 <!--
 1:25–2:20
 
-Мотивация была нормальной: получить современный frontend-фреймворк,
-понятный SSR и постепенно уйти от самодельной схемы.
+[click] Первая причина — просто захотелось. Я могу себе позволить этот
+эксперимент, у меня есть академический интерес к новому инструменту.
 
-С агентом миграция казалась не отдельным проектом, а задачей на вечер.
+[click] Вторая — самодельный SSR сложно поддерживать. При этом SSR для
+проекта очень важен: каталогу мероприятий нужна хорошая индексация.
+Хотел получить стандартный механизм вместо поддержки собственного.
+
+[click] Третья — у меня есть мини-аппы. Сейчас они просто на Vue-компоненте,
+и такая основа не очень удобна.
+
+Nuxt уже существует. Агент уже существует. Что может пойти не так?
+Дальше покажу, как всё было устроено до переезда.
 -->
 
 ---
@@ -127,7 +206,7 @@ layout: two-cols-header
 
 ::right::
 
-```mermaid {scale: 0.78}
+```mermaid {scale: 0.78, look: 'classic'}
 flowchart TD
   T[PHP / Twig page] --> W[Web Components]
   V[Vue components] --> W
@@ -157,6 +236,7 @@ layout: default
 ````md magic-move {lines: true}
 ```ts
 // utils/webComponentPinia.ts
+// Общий экземпляр Pinia для всех Web Components
 export const webComponentPinia = createPinia()
 ```
 
@@ -192,7 +272,9 @@ customElements.define('event-personal-week', Element)
 <!--
 3:20–4:00
 
-Быстро прокликать три состояния: Pinia создаётся один раз в отдельном модуле;
+Pinia создаётся один раз в JS-модуле и используется всеми Web Components.
+При импорте компоненты получают тот же экземпляр, а не создают новый.
+Быстро прокликать три состояния:
 обычный Vue SFC передаётся в defineCustomElement; configureApp подключает тот
 же Pinia; customElements.define регистрирует тег.
 -->
@@ -205,10 +287,10 @@ layout: two-cols-header
 
 ::left::
 
-```mermaid {scale: 0.76}
+```mermaid {scale: 0.76, look: 'classic'}
 flowchart TD
-  D[PHP worker — демон] --> V[V8 как .so]
-  S[Подготовленные данные] --> P[Pinia snapshot]
+  J[JS-бандл после webpack] --> P[V8 snapshot в кеше]
+  D[PHP worker — демон] -->|данные для Pinia| V[V8 как .so]
   P --> V
   V --> H[SSR HTML]
   H --> B[Браузер]
@@ -216,7 +298,7 @@ flowchart TD
   classDef hot fill:#a6ff5f,color:#0b0d0f,stroke:#a6ff5f;
   classDef base fill:#181b20,color:#f4f0e8,stroke:#555b66;
   class V,P hot;
-  class D,S,H,B base;
+  class D,J,H,B base;
 ```
 
 ::right::
@@ -241,6 +323,9 @@ flowchart TD
 V8 подгружался как so-библиотека, а в SSR прокидывались заранее
 подготовленные данные для Pinia.
 
+Snapshot — снимок V8 после загрузки JS-бандла, а не данные Pinia.
+Данные текущего запроса PHP готовит отдельно и передаёт в renderSsr.
+
 Да, звучит дико. Но оно работало.
 
 Концептуальная цена — дублирование логики. И PHP, и JavaScript должны были
@@ -252,56 +337,75 @@ V8 подгружался как so-библиотека, а в SSR прокид
 layout: default
 ---
 
-# SSR: webpack → PHP → V8 → Pinia
+# SSR: JS → snapshot → HTML
+
+<p class="lead">
+<strong class="accent">{{ $clicks === 0 ? 'JavaScript' : 'PHP' }}</strong>
+— {{ ['Готовый ssr.js', 'Читаем JS и создаём snapshot', 'Готовим данные вместо запросов к API', 'Вызываем функцию через V8 и получаем HTML'][$clicks] }}
+</p>
 
 ````md magic-move {lines: true}
-```php
-// EventService.php
-$snapshotSourcePath = __DIR__.'/../../public/build/eventsListSsrFunc.js'; // webpack output
-$snapshotCacheKey = 'snapshot_'.hash_file('sha256', $snapshotSourcePath);
+```js
+import { renderToString } from 'vue/server-renderer' // Vue → HTML
 
-$snapshot = $this->ssrCachePool->get($snapshotCacheKey,
-    static function () use ($snapshotSourcePath) {
-        return V8Js::createSnapshot(file_get_contents($snapshotSourcePath)); // read → V8 cache
-    });
+function renderSsr(dataFromPhp) {
+  const vueApp = createVueCatalog() // Vue-приложение с каталогом
+  fillPiniaWithEvents(dataFromPhp.events) // данные PHP → Pinia
+  return renderToString(vueApp) // возвращаем HTML-строку
+}
+
+global.renderSsr = renderSsr // эту функцию вызовет PHP через V8
 ```
 
 ```php
-// Смысл реального кода: эмулируем API-запросы внутри PHP
-$apiResponses = [
+// Подготавливаем и кешируем V8 snapshot
+$snapshot = $this->ssrCachePool->get($key, function () {
+    $js = file_get_contents('ssr.js'); // читаем готовый webpack-бандл
+    return V8Js::createSnapshot($js);
+});
+```
+
+```php
+// Эмулируем API внутри PHP, без HTTP
+$context = [
+    'locale'   => 'ru',
     'events'   => emulateGet('/api/events?...'),
     'tags'     => emulateGet('/api/tags?...'),
     'geonames' => emulateGet('/api/geonames/published'),
-]; // никакого HTTP
+];
 ```
 
 ```php
-// EventService.php
-$context = json_encode(['events' => $normalizedEvents, /* ... */]); // payload для Pinia
-$v8 = new V8Js('php', [], $snapshot); // кешированный webpack-бандл
+$v8 = new V8Js('php', [], $snapshot); // V8 с подготовленным скриптом
+$contextJson = json_encode($context); // данные для Pinia
 
-$html = (new V8($v8))->run(
-    "var context={$context}; renderSsr(context).then(html => print(html));"
+// Строка — JS внутри V8; результат возвращается в PHP
+$html = new V8($v8)->run(
+    "globalThis.renderSsr({$contextJson}).then(html => print(html));"
 );
-```
-
-```ts
-// eventsListSsrFunc.ts — код уже выполняется внутри V8
-const { app } = BaseEventsList(context.locale)
-
-useEventsStore().setStateFromResponse(JSON.parse(context.events)) // PHP → Pinia
-usePublishedGeonamesStore().applyGeonames(JSON.parse(context.geonames))
-
-return renderToString(app)
 ```
 ````
 
 <!--
 4:25–4:50
 
-Четыре быстрых клика: PHP читает webpack-бандл и кеширует V8 snapshot;
-запросы к API эмулируются прямо внутри PHP, без HTTP; ответы складываются
-в context и уходят в V8; JS гидратирует Pinia и делает renderToString.
+Четыре состояния: сначала JavaScript, затем три шага на стороне PHP.
+ssr.js — условное короткое имя настоящего eventsListSsrFunc.js.
+
+Сначала показываю, что делает собранный JS: получает данные, заполняет
+Pinia, рендерит Vue в HTML и выставляет renderSsr в global.
+createVueCatalog и fillPiniaWithEvents — условные имена для схемы:
+создание Vue-приложения каталога и заполнение его Pinia данными из PHP.
+renderToString — настоящая функция из vue/server-renderer. Импорт показан
+для пояснения; в готовом webpack-бандле эта зависимость уже собрана.
+
+[click] PHP читает этот файл и создаёт кешируемый V8 snapshot. $key в
+примере сокращён: в реальном коде ключ зависит от хеша webpack-бандла.
+
+[click] Для запроса PHP готовит context: эмулирует ответы API без HTTP.
+
+[click] Всё ещё PHP: создаёт V8 со snapshot, передаёт JSON и запускает
+globalThis.renderSsr. Строка выполняется как JS внутри V8; HTML получаем в PHP.
 -->
 
 ---
@@ -505,7 +609,7 @@ class: statement-slide result-slide
 <h1>Код появился быстрее,<br>чем я научился его <span class="accent">валидировать</span></h1>
 
 <div class="fix-stream">
-composable → SEO → routing → legacy → assets → analytics → tests
+Проверки были. Но не всё важное они проверяли.
 </div>
 </div>
 
@@ -522,6 +626,10 @@ composable → SEO → routing → legacy → assets → analytics → tests
 
 Уверенный рабочий код ещё надо уметь отличить от уверенно выглядящего.
 
+Функциональные тесты сделали эксперимент возможным, но не ловили рост
+связности, сложности и времени ответа. Как проверять эти свойства
+автоматически — для меня пока открытый вопрос, а не готовый вывод.
+
 [click] И вот это довольно точно описывает, как ощущался результат.
 -->
 
@@ -535,36 +643,22 @@ layout: default
   <div v-click class="lesson">
     <span class="lesson-number">01</span>
     <div class="lesson-copy">
-      <strong>Новый фреймворк всё равно придётся изучить.</strong>
+      <strong>Nuxt всё равно придётся изучить.</strong>
       <p>Агент ускоряет написание кода, но не заменяет понимание.</p>
     </div>
   </div>
   <div v-click class="lesson">
     <span class="lesson-number">02</span>
     <div class="lesson-copy">
-      <strong>Нельзя делегировать ещё не приобретённый навык.</strong>
-      <p>Если я не знаю, как правильно, то не отличу решение от правдоподобной имитации.</p>
+      <strong>Нельзя делегировать то, что не умеешь проверять.</strong>
+      <p>Если я не понимаю, как правильно, то не отличу хорошее решение от правдоподобного.</p>
     </div>
   </div>
   <div v-click class="lesson">
     <span class="lesson-number">03</span>
     <div class="lesson-copy">
-      <strong>Тесты сделали этот эксперимент вообще возможным.</strong>
-      <p>Без регрессионных тестов я бы не рискнул менять живую систему.</p>
-    </div>
-  </div>
-  <div v-click class="lesson">
-    <span class="lesson-number">04</span>
-    <div class="lesson-copy">
-      <strong>Я всё ещё не решил: продолжать кактус или откатить.</strong>
-      <p>Эксперимент дал знания, но ещё не доказал, что миграцию стоит продолжать.</p>
-    </div>
-  </div>
-  <div v-click class="lesson">
-    <span class="lesson-number">05</span>
-    <div class="lesson-copy">
-      <strong>Нужен был отдельный контур контроля качества.</strong>
-      <p>Функциональные тесты не ловили рост связности, сложности и времени ответа.</p>
+      <strong>Без тестов я бы не рискнул менять живой проект.</strong>
+      <p>Они сделали эксперимент возможным, но не гарантировали качество всех решений.</p>
     </div>
   </div>
 </div>
@@ -574,14 +668,10 @@ layout: default
 
 [click] Агент ускоряет написание кода, но не заменяет понимание.
 
-[click] Если я сам не приобрёл навык, я не смогу нормально проверить результат агента.
+[click] Если я не понимаю, как правильно, то не отличу хорошее решение от правдоподобного.
 
-[click] Без регрессионных тестов я бы не стал даже пробовать.
-
-[click] И честный текущий результат: я пока не уверен, стоит ли продолжать миграцию.
-
-[click] Но функционального harness оказалось мало. Нужны были ограничения
-на связность и сложность плюс хотя бы базовые замеры производительности.
+[click] Без тестов я бы не стал даже пробовать. Они сделали эксперимент
+возможным, но не гарантировали качество всех решений.
 -->
 
 ---
@@ -599,4 +689,7 @@ class: final-slide
 «Резюме-девелопмент» — это выбор технологий ради строчки в резюме,
 а не ради пользы для продукта, иногда ещё и без достаточной квалификации.
 Не development вообще. Сам эксперимент всё равно оказался полезным.
+
+Я всё ещё не решил: продолжать миграцию или откатить. Эксперимент дал знания,
+но ещё не доказал, что миграцию стоит продолжать.
 -->
