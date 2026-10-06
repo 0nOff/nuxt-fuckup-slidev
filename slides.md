@@ -287,7 +287,106 @@ layout: two-cols-header
 
 ::left::
 
-```mermaid {scale: 0.76, look: 'classic'}
+### PHP
+
+```php
+$v8 = new V8Js(); // движок внутри PHP
+$result = $v8->executeString('2 + 2'); // JS
+echo $result; // 4
+```
+
+::right::
+
+```mermaid {scale: 0.65, look: 'classic'}
+flowchart TD
+  J[JS-бандл после webpack] --> P[V8 snapshot в кеше]
+  D[PHP worker — демон] -->|данные для Pinia| V[V8 как .so]
+  P --> V
+  V --> H[SSR HTML]
+  H --> B[Браузер]
+
+  classDef hot fill:#a6ff5f,color:#0b0d0f,stroke:#a6ff5f;
+  classDef base fill:#181b20,color:#f4f0e8,stroke:#555b66;
+  class V hot;
+  class D,J,P,H,B base;
+```
+
+<!--
+15–20 секунд.
+
+V8 подключался к PHP как расширение. Класс называется V8Js.
+Создаём объект, передаём JS-строку в executeString и получаем результат
+обратно в PHP. Браузер и отдельный Node.js-сервер для этого не нужны.
+На схеме справа — место V8 в общей серверной реализации.
+-->
+
+---
+layout: two-cols-header
+---
+
+# SSR: JS → snapshot → HTML
+
+::left::
+
+<p class="lead">
+<strong class="accent">{{ $clicks === 0 ? 'JavaScript' : 'PHP' }}</strong>
+— {{ ['Готовый ssr.js', 'JS → snapshot', 'Эмулируем API', 'V8 → HTML'][$clicks] }}
+</p>
+
+````md magic-move {lines: true}
+```js
+import {
+  renderToString // Vue → HTML
+} from 'vue/server-renderer'
+function renderSsr(data) {
+  const app = createVueCatalog() // каталог
+  fillPiniaWithEvents(data.events) // Pinia
+  return renderToString(app) // HTML
+}
+global.renderSsr = renderSsr // вызовет PHP
+```
+
+```php
+$snapshot = $this->ssrCachePool->get(
+    $key, function () {
+        // JS после webpack
+        $js = file_get_contents('ssr.js');
+        return V8Js::createSnapshot($js);
+    }
+);
+```
+
+```php
+// Эмулируем API внутри PHP, без HTTP
+$context = [
+    'locale'   => 'ru',
+    'events'   => emulateGet(
+        '/api/events?...'
+    ),
+    'tags'     => emulateGet('/api/tags?...'),
+    'geonames' => emulateGet(
+        '/api/geonames/published'
+    ),
+];
+```
+
+```php
+$v8 = new V8Js(snapshot_blob: $snapshot);
+$json = json_encode($context); // Pinia
+
+// Перехватываем HTML, напечатанный JS
+ob_start();
+$v8->executeString(
+    "globalThis.renderSsr({$json})"
+    . ".then(html => print(html));"
+);
+$html = ob_get_clean();
+```
+````
+
+::right::
+
+```mermaid {scale: 0.65, look: 'classic'}
 flowchart TD
   J[JS-бандл после webpack] --> P[V8 snapshot в кеше]
   D[PHP worker — демон] -->|данные для Pinia| V[V8 как .so]
@@ -301,93 +400,8 @@ flowchart TD
   class D,J,H,B base;
 ```
 
-::right::
-
-<div class="aside">
-  <strong>Да, это работало.</strong><br>
-  PHP не умирал, V8 жил внутри него.<br>
-  Компоненты рендерились на сервере.
-</div>
-
-<div class="failure-copy server-flaw">
-  <strong>Но правила URL жили дважды</strong>
-  <code>/event?event_filter[city_id][]=524901</code>
-  <span>→ 301 /event/moscow</span>
-  PHP и JS независимо разбирали один фильтр.
-</div>
-
 <!--
-4:00–4:25
-
-Это место можно рассказывать с удовольствием: PHP работал демоном,
-V8 подгружался как so-библиотека, а в SSR прокидывались заранее
-подготовленные данные для Pinia.
-
-Snapshot — снимок V8 после загрузки JS-бандла, а не данные Pinia.
-Данные текущего запроса PHP готовит отдельно и передаёт в renderSsr.
-
-Да, звучит дико. Но оно работало.
-
-Концептуальная цена — дублирование логики. И PHP, и JavaScript должны были
-разобрать event_filter, понять, что 524901 — Москва, и знать канонический
-адрес /event/moscow. Эти правила могли разъехаться.
--->
-
----
-layout: default
----
-
-# SSR: JS → snapshot → HTML
-
-<p class="lead">
-<strong class="accent">{{ $clicks === 0 ? 'JavaScript' : 'PHP' }}</strong>
-— {{ ['Готовый ssr.js', 'Читаем JS и создаём snapshot', 'Готовим данные вместо запросов к API', 'Вызываем функцию через V8 и получаем HTML'][$clicks] }}
-</p>
-
-````md magic-move {lines: true}
-```js
-import { renderToString } from 'vue/server-renderer' // Vue → HTML
-
-function renderSsr(dataFromPhp) {
-  const vueApp = createVueCatalog() // Vue-приложение с каталогом
-  fillPiniaWithEvents(dataFromPhp.events) // данные PHP → Pinia
-  return renderToString(vueApp) // возвращаем HTML-строку
-}
-
-global.renderSsr = renderSsr // эту функцию вызовет PHP через V8
-```
-
-```php
-// Подготавливаем и кешируем V8 snapshot
-$snapshot = $this->ssrCachePool->get($key, function () {
-    $js = file_get_contents('ssr.js'); // читаем готовый webpack-бандл
-    return V8Js::createSnapshot($js);
-});
-```
-
-```php
-// Эмулируем API внутри PHP, без HTTP
-$context = [
-    'locale'   => 'ru',
-    'events'   => emulateGet('/api/events?...'),
-    'tags'     => emulateGet('/api/tags?...'),
-    'geonames' => emulateGet('/api/geonames/published'),
-];
-```
-
-```php
-$v8 = new V8Js('php', [], $snapshot); // V8 с подготовленным скриптом
-$contextJson = json_encode($context); // данные для Pinia
-
-// Строка — JS внутри V8; результат возвращается в PHP
-$html = new V8($v8)->run(
-    "globalThis.renderSsr({$contextJson}).then(html => print(html));"
-);
-```
-````
-
-<!--
-4:25–4:50
+40–50 секунд.
 
 Четыре состояния: сначала JavaScript, затем три шага на стороне PHP.
 ssr.js — условное короткое имя настоящего eventsListSsrFunc.js.
@@ -401,11 +415,51 @@ renderToString — настоящая функция из vue/server-renderer. �
 
 [click] PHP читает этот файл и создаёт кешируемый V8 snapshot. $key в
 примере сокращён: в реальном коде ключ зависит от хеша webpack-бандла.
+Snapshot — снимок V8 после загрузки JS-бандла, а не данные Pinia.
 
 [click] Для запроса PHP готовит context: эмулирует ответы API без HTTP.
 
 [click] Всё ещё PHP: создаёт V8 со snapshot, передаёт JSON и запускает
-globalThis.renderSsr. Строка выполняется как JS внутри V8; HTML получаем в PHP.
+globalThis.renderSsr через executeString. JS печатает HTML, PHP забирает его
+из буфера вывода. В реальном коде буферизацию выполняет V8::run из Spatie SSR;
+здесь показаны его действия без дополнительного класса-обёртки.
+snapshot_blob — именованный параметр конструктора V8Js для снимка.
+Схема остаётся на экране во всех четырёх состояниях.
+-->
+
+---
+layout: two-cols-header
+---
+
+# Самодельный SSR: плюсы и минусы
+
+::left::
+
+<div class="aside">
+  <strong>Да, это работало.</strong><br>
+  PHP не умирал, V8 жил внутри него.<br>
+  Компоненты рендерились на сервере.
+</div>
+
+::right::
+
+<div class="failure-copy server-flaw">
+  <strong>Но правила URL жили дважды</strong>
+  <code>/event?event_filter[city_id][]=524901</code>
+  <span>→ 301 /event/moscow</span>
+  PHP и JS независимо разбирали один фильтр.
+</div>
+
+<!--
+20–25 секунд.
+
+Только после демонстрации подвести итог: PHP работал демоном,
+V8 жил внутри него, Vue-компоненты отдавали готовый HTML.
+Самодельную сборку, snapshot и подготовку данных приходилось поддерживать.
+
+Концептуальная цена — дублирование логики. И PHP, и JavaScript должны были
+разобрать event_filter, понять, что 524901 — Москва, и знать канонический
+адрес /event/moscow. Эти правила могли разъехаться.
 -->
 
 ---
@@ -684,7 +738,7 @@ class: final-slide
 <div class="final-word">Но хорошо, что я попробовал.</div>
 
 <!--
-13:45–15:00
+13:45–14:00
 
 «Резюме-девелопмент» — это выбор технологий ради строчки в резюме,
 а не ради пользы для продукта, иногда ещё и без достаточной квалификации.
@@ -692,4 +746,77 @@ class: final-slide
 
 Я всё ещё не решил: продолжать миграцию или откатить. Эксперимент дал знания,
 но ещё не доказал, что миграцию стоит продолжать.
+-->
+
+---
+layout: two-cols-header
+---
+
+# SDLC изменился. Что дальше?
+
+<div class="muted text-sm">SDLC — Software Development Life Cycle</div>
+
+::left::
+
+### Ревью вручную
+
+Я — узкое горлышко.
+
+Опираюсь на прежний опыт,<br>а новый почти не набираю.
+
+::right::
+
+### Довериться моделям
+
+<v-switch>
+<template #0>
+
+Модели пишут и проверяют код.
+
+Для меня он становится<br>чёрным ящиком.
+
+</template>
+<template #1>
+<img src="/black-box-potato-meme.png" class="max-h-72 w-full object-contain" alt="Мем: доверился совету GPT про драники">
+</template>
+</v-switch>
+
+<div class="bottom-line">
+  К чему это приведёт — я пока не знаю.
+</div>
+
+<!--
+14:00–14:50
+
+Для меня SDLC уже изменился: агенты могут быстро написать уверенно
+выглядящий код, который проходит функциональные тесты, но при этом
+остаётся плохим решением.
+
+Если я вручную смотрю каждый merge request, то становлюсь узким горлышком.
+Проверяю на базе того, что уже знаю, но сам почти не прохожу путь,
+на котором этот опыт набирается. А в незнакомой технологии мой прежний
+опыт ещё и не гарантирует, что я замечу неправильное решение.
+
+Другой путь — отдать написание и проверку моделям и относиться к результату
+как к чёрному ящику. Это не рекомендация: я пока не знаю, к чему мы придём.
+
+[click] Мем про драники — иллюстрация доверия к чёрному ящику.
+-->
+
+---
+layout: center
+class: final-slide
+---
+
+# Спасибо за внимание
+
+Пётр Белобородов
+
+<p class="lead"><a href="https://t.me/onoff">Telegram · t.me/onoff</a></p>
+
+<!--
+14:50–15:00
+
+Спасибо! Если хочется обсудить миграцию или то, как теперь проверять
+агентский код, — пишите в Telegram.
 -->
